@@ -1,99 +1,83 @@
-# Gradle
-# Build your Java project and run tests with Gradle using a Gradle wrapper script.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
 - dev
 
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  SONAR_PROJECT_NAME: "My Project"
+  SONAR_PROJECT_KEY: "my-project-key"
+  SONAR_ORGANIZATION: "my-organization"
+  SONAR_HOST_URL: "https://my-sonarqube-server.com"
+
 stages:
-- stage: LintBuild
-  displayName: Lint and Build Stage
-  jobs:
-  - job: Lint
-    displayName: Lint Job
-    steps:
-    - script: echo 'Running lint...'
-      displayName: Lint
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        tasks: 'checkstyle'
+  - stage: LintBuildDocker
+    displayName: Lint and Build Stage
+    jobs:
+    - job: Lint
+      displayName: Lint Job
+      steps:
+      - script: echo 'Running lint...'
+        displayName: Lint
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          tasks: 'checkstyleMain checkstyleTest'
 
-- stage: UnitTest
-  displayName: Unit Test Stage
-  jobs:
-  - job: UnitTest
-    displayName: Unit Test Job
-    steps:
-    - script: echo 'Running unit tests...'
-      displayName: Unit Test
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        tasks: 'test'
-
-- stage: SonarQube
-  displayName: SonarQube Stage
-  jobs:
-  - job: SonarQube
-    displayName: SonarQube Job
-    steps:
-    - script: echo 'Running SonarQube...'
+  - stage: UnitTestandDockerBuildPush
+    displayName: Unit Test Stage and Docker buildPush
+    jobs:
+    - job: UnitTest
+      displayName: Unit Test Job
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+      - script: echo 'Running unit tests...'
+        displayName: Unit Test
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          tasks: 'clean build'
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'docker'
+          repository: 'prashantrakh20/spring-boot-app'
+          command: 'build'
+          Dockerfile: '**/Dockerfile'
+          tags: 'latest'
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'docker'
+          repository: 'prashantrakh20/spring-boot-app'
+          command: 'push'
+          tags: 'latest'      
+      
+  - stage: Docker_Pull
+    displayName: DockerPull
+    jobs:
+    - job: Pull
+      displayName: pull
+      steps:
+      - script: echo 'Pulling Image ..'
+        displayName: Dockerpull
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          tasks: 'pullDockerImage'
+  - stage: SonarQube_Stage
+    displayName: SonarQube Stage
+    jobs:
+    - job: SonarQube 
       displayName: SonarQube
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        tasks: 'sonarqube'
-
-- stage: BuildImage
-  displayName: Build Image Stage
-  jobs:
-  - job: BuildImage
-    displayName: Build Image Job
-    steps:
-    - script: echo 'Building Docker image...'
-      displayName: Build Image
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'dockerhub'
-        repository: 'prashantrakh20/spring-boot-app'
-        command: 'build'
-        Dockerfile: '**/Dockerfile'
-        tags: 'latest'
-
-- stage: PushToRegistry
-  displayName: Push to Registry Stage
-  jobs:
-  - job: PushToRegistry
-    displayName: Push to Registry Job
-    steps:
-    - script: echo 'Pushing Docker image to registry...'
-      displayName: Push to Registry
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'dockerhub'
-        repository: 'prashantrakh20/spring-boot-app'
-        command: 'push'
-        tags: 'latest'
-
-- stage: PullImage
-  displayName: Pull 
-  jobs:
-  - job: Pull
-    displayName: Pull 
-    steps:
-    - script: echo 'Pull Docker image..'
-      displayName: Pull to Registry
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'dockerhub'
-        repository: 'prashantrakh20/spring-boot-app'
-        command: 'pull'
-        tags: 'latest'
+      steps:
+      - script: echo 'SonarQube Stage ..'
+        displayName: SonarQube 
+      - task: Gradle@2
+        inputs:
+          gradleWrapperFile: 'gradlew'
+          tasks: 'sonarqube'
+          jdkVersionOption: '1.11'
+          gradleOptions: '-Dsonar.projectName=$(SONAR_PROJECT_NAME) -Dsonar.projectKey=$(SONAR_PROJECT_KEY) -Dsonar.organization=$(SONAR_ORGANIZATION) -Dsonar.host.url=$(SONAR_HOST_URL)'

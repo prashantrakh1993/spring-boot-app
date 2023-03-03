@@ -33,12 +33,18 @@ test {
     useJUnitPlatform()
 }
 
-// // SonarQube Stage
-// sonarqube {
-//   properties {
-//     property "sonar.projectName", "Your Project Name"
-//     property "sonar.projectKey", "your.project.key"
-//     property "sonar.organization", "your-organization-name"
-//     property "sonar.host.url", "https://
-//   }
-// }
+// SonarQube Stage
+sonarqube {
+    properties {
+        property "sonar.projectName", System.getenv("SONAR_PROJECT_NAME")
+        property "sonar.projectKey", System.getenv("SONAR_PROJECT_KEY")
+        property "sonar.organization", System.getenv("SONAR_ORGANIZATION")
+        property "sonar.host.url", System.getenv("SONAR_HOST_URL")
+    }
+}
+
+//Docker Pull
+task pullDockerImage(type:Exec) {
+    commandLine 'docker', 'pull', 'prashantrakh20/spring-boot-app:latest'
+}
+
