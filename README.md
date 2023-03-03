@@ -1,3 +1,15 @@
+Prerequistes:
+1. You need to have Sonarqube configurations to run sonarqube stage on your local environment.
+2. Yo must kubernetes cluster in order to deploy the kubernetes application. (Menifest files are avaialble in deploy directory)
+3. Azure DevOps account to run the stages such Lint Stage,Test and Docker build - Push stage,Docker pull stage etc. (All the stages are writeen in azure-pipelines.yml)
+
+
+How pipeline is implemented:
+
+1. I have wrote build and execution logic for different stages in build.gradle file.
+2. Automated the CI task using azure Devops as CI tool and gradle as the build tool.
+
+******
 build.gradle
 ******
 This is a sample Gradle build file for a Spring Boot application. It includes several plugins, dependencies, and configurations.
@@ -39,10 +51,9 @@ Docker Pull Stage
 The pullDockerImage task in this build file specifies a command to pull a Docker image for a Spring Boot application.
 
 ***
-
 azure-pipelines.yml
-
 ***
+
 This repository contains an Azure Pipelines configuration file (azure-pipelines.yml) for building and deploying a Spring Boot application with Gradle, Docker, and SonarQube.
 
 Configuration Overview
@@ -76,6 +87,22 @@ This stage has one job called UnitTest. The job runs unit tests and then builds 
 
 Docker_Pull
 This stage has one job called Pull. The job pulls a Docker image from the Docker registry.
+
+
+***
+HOW TO DEPLOY APPLICATION ON KUBERNETES
+***
+
+You need to follow following steps in order to deploy application on your kubernetes cluster
+RUN FOLLOWING COMMANDS:
+
+1. clone the repo on your folder
+2. export KUBECONFIG=$(pwd)/PATH_TO_KUBECONFIG.yaml
+3. run
+    kubectl apply -f deploy/deployment.yaml
+    kubectl apply -f deploy/service.yaml
+    kubectl apply -f deploy/ingress.yaml (Note: You need to edit the endpoints and certificate/secret in ingress.yaml depending on your domain)
+
 
 
 
