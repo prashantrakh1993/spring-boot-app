@@ -1,6 +1,6 @@
 Prerequistes:
 1. You need to have Sonarqube configurations to run sonarqube stage on your local environment.
-2. Yo must kubernetes cluster in order to deploy the kubernetes application. (Menifest files are avaialble in deploy directory)
+2. Yo must have kubernetes cluster in order to deploy the application on kubernetes application. (Menifest files are avaialble in deploy directory)
 3. Azure DevOps account to run the stages such Lint Stage,Test and Docker build - Push stage,Docker pull stage etc. (All the stages are writeen in azure-pipelines.yml)
 
 
