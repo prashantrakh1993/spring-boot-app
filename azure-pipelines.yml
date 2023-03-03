@@ -1,0 +1,84 @@
+# Gradle
+# Build your Java project and run tests with Gradle using a Gradle wrapper script.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- dev
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: LintBuild
+  displayName: Lint and Build Stage
+  jobs:
+  - job: Lint_Build
+    displayName: Lint Job
+    steps:
+    - script: echo 'Running lint...'
+      displayName: Lint
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        tasks: 'build'
+
+- stage: UnitTest
+  displayName: Unit Test Stage
+  jobs:
+  - job: UnitTest
+    displayName: Unit Test Job
+    steps:
+    - script: echo 'Running unit tests...'
+      displayName: Unit Test
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        tasks: 'test'
+
+- stage: SonarQube
+  displayName: SonarQube Stage
+  jobs:
+  - job: SonarQube
+    displayName: SonarQube Job
+    steps:
+    - script: echo 'Running SonarQube...'
+      displayName: SonarQube
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        tasks: 'sonarqube'
+
+- stage: BuildImage
+  displayName: Build Image Stage
+  jobs:
+  - job: BuildImage
+    displayName: Build Image Job
+    steps:
+    - script: echo 'Building Docker image...'
+      displayName: Build Image
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'my-repo'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        tags: 'latest'
+
+- stage: PushToRegistry
+  displayName: Push to Registry Stage
+  jobs:
+  - job: PushToRegistry
+    displayName: Push to Registry Job
+    steps:
+    - script: echo 'Pushing Docker image to registry...'
+      displayName: Push to Registry
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'my-repo'
+        command: 'push'
+        tags: 'latest'
