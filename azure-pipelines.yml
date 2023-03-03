@@ -13,7 +13,7 @@ stages:
 - stage: LintBuild
   displayName: Lint and Build Stage
   jobs:
-  - job: Lint_Build
+  - job: Lint
     displayName: Lint Job
     steps:
     - script: echo 'Running lint...'
@@ -22,7 +22,7 @@ stages:
       inputs:
         workingDirectory: ''
         gradleWrapperFile: 'gradlew'
-        tasks: 'build'
+        tasks: 'checkstyle'
 
 - stage: UnitTest
   displayName: Unit Test Stage
@@ -63,7 +63,7 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'dockerhub'
-        repository: 'my-repo'
+        repository: 'prashantrakh20/spring-boot-app'
         command: 'build'
         Dockerfile: '**/Dockerfile'
         tags: 'latest'
@@ -79,6 +79,21 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'dockerhub'
-        repository: 'my-repo'
+        repository: 'prashantrakh20/spring-boot-app'
         command: 'push'
+        tags: 'latest'
+
+- stage: PullImage
+  displayName: Pull 
+  jobs:
+  - job: Pull
+    displayName: Pull 
+    steps:
+    - script: echo 'Pull Docker image..'
+      displayName: Pull to Registry
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'prashantrakh20/spring-boot-app'
+        command: 'pull'
         tags: 'latest'

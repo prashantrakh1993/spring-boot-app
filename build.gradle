@@ -18,9 +18,10 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
-#Lint Stage
+// Lint Stage
 checkstyle {
     toolVersion = '8.36'
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
@@ -28,41 +29,16 @@ checkstyle {
     ignoreFailures = false
 }
 
-#Unit Test Stage
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-jacoco {
-  toolVersion = "0.8.7"
-  reportsDir = file("$buildDir/jacoco/test.exec")
-}
-
 test {
-  finalizedBy jacocoTestReport
+    useJUnitPlatform()
 }
 
-jacocoTestReport {
-  dependsOn test
-  reports {
-    xml.enabled false
-    csv.enabled false
-    html.destination file("${buildDir}/reports/jacoco/")
-  }
-}
-
-#SonarQube Stage
-sonarqube {
-  properties {
-    property "sonar.projectName", "Your Project Name"
-    property "sonar.projectKey", "your.project.key"
-    property "sonar.organization", "your-organization-name"
-    property "sonar.host.url", "https://your.sonarqube.url.com"
-    property "sonar.login", "your-sonar-token"
-    property "sonar.sourceEncoding", "UTF-8"
-  }
-}
-
-
-
-
+// // SonarQube Stage
+// sonarqube {
+//   properties {
+//     property "sonar.projectName", "Your Project Name"
+//     property "sonar.projectKey", "your.project.key"
+//     property "sonar.organization", "your-organization-name"
+//     property "sonar.host.url", "https://
+//   }
+// }
