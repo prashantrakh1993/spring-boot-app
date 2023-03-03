@@ -89,6 +89,17 @@ Docker_Pull
 This stage has one job called Pull. The job pulls a Docker image from the Docker registry.
 
 
+
+***
+How to Run the pipeline
+***
+
+1. Clone the repository in your Azure DevOps Project.
+2. Go to the pipelines section 
+3. Select the repository
+4. Run the pipeline. (Please edit Sonarqube configurations before Running the application)
+
+
 ***
 HOW TO DEPLOY APPLICATION ON KUBERNETES
 ***
