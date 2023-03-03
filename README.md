@@ -41,6 +41,8 @@ The pullDockerImage task in this build file specifies a command to pull a Docker
 ***
 
 azure-pipelines.yml
+
+***
 This repository contains an Azure Pipelines configuration file (azure-pipelines.yml) for building and deploying a Spring Boot application with Gradle, Docker, and SonarQube.
 
 Configuration Overview
