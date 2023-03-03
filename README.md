@@ -110,9 +110,15 @@ RUN FOLLOWING COMMANDS:
 1. clone the repo on your folder
 2. export KUBECONFIG=$(pwd)/PATH_TO_KUBECONFIG.yaml
 3. run
+    (Note: You need to edit the endpoints and certificate/secret in ingress.yaml depending on your domain)
+    
     kubectl apply -f deploy/deployment.yaml
+    
     kubectl apply -f deploy/service.yaml
-    kubectl apply -f deploy/ingress.yaml (Note: You need to edit the endpoints and certificate/secret in ingress.yaml depending on your domain)
+    
+    kubectl apply -f deploy/ingress.yaml 
+    
+    
 
 
 
